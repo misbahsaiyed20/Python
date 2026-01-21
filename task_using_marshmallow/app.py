@@ -1,17 +1,23 @@
+from flask import Flask, request, jsonify
 from validation import UserSchema
 
+app = Flask(__name__)
 schema = UserSchema()
 
-user_data = {
-    "name": "Misba",
-    "email": "misbaemail",
-    "age": "twenty"
-}
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+     errors = schema.validate(data)
 
-# checking user input using marshmallow
-errors = schema.validate(user_data)
+    if errors:
+        return jsonify({
+            "message": "Invalid input",
+            "errors": errors
+        }), 400
 
-if errors:
-    print("Input validation failed:", errors)
-else:
-    print("All inputs are valid")
+    return jsonify({
+        "message": "Login successful"
+    }), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
